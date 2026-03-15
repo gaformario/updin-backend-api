@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Usuario {
+  id           String       @id @default(uuid()) @map("usuarioId")
+  nome         String
+  usuario      String       @unique
+  email        String?      @unique
+  senhaHash    String       @map("senha_hash")
+  tipo         UserType
+  ativo        Boolean      @default(true)
+  criadoEm     DateTime     @default(now()) @map("criado_em")
+  atualizadoEm DateTime     @updatedAt @map("atualizado_em")
+
+  responsavel  Responsavel?
+  adolescente  Adolescente?
+
+  @@map("usuarios")
+}
+
+enum UserType {
+  responsavel
+  adolescente
+}
+
+model Responsavel {
+  id           String        @id @default(uuid()) @map("responsavelId")
+  usuarioId    String        @unique
+  cpf          String?       @unique
+  telefone     String?
+  criadoEm     DateTime      @default(now()) @map("criado_em")
+  atualizadoEm DateTime      @updatedAt @map("atualizado_em")
+
+  usuario      Usuario       @relation(fields: [usuarioId], references: [id])
+  adolescente  Adolescente[]
+  mesadas      Mesada[]
+
+  @@map("responsaveis")
+}
+
+model Adolescente {
+  id             String        @id @default(uuid()) @map("adolescenteId")
+  usuarioId      String        @unique
+  responsavelId  String
+  cpf            String?       @unique
+  dataNascimento DateTime      @map("data_nascimento")
+  telefone       String?
+  criadoEm       DateTime      @default(now()) @map("criado_em")
+  atualizadoEm   DateTime      @updatedAt @map("atualizado_em")
+
+  usuario        Usuario       @relation(fields: [usuarioId], references: [id])
+  responsavel    Responsavel   @relation(fields: [responsavelId], references: [id])
+  conta          Conta?
+  mesadas        Mesada[]
+
+  @@map("adolescentes")
+}
+
+model Conta {
+  id             String         @id @default(uuid()) @map("contaId")
+  adolescenteId  String         @unique
+  saldoTotal     Float          @default(0) @map("saldo_total")
+  criadoEm       DateTime       @default(now()) @map("criado_em")
+  atualizadoEm   DateTime       @updatedAt @map("atualizado_em")
+
+  adolescente    Adolescente    @relation(fields: [adolescenteId], references: [id])
+  movimentacoes  Movimentacao[]
+
+  @@map("contas")
+}
+
+model Mesada {
+  id             String         @id @default(uuid()) @map("mesadaId")
+  adolescenteId  String
+  responsavelId  String
+  valor          Float
+  periodicidade  Periodicidade
+  ativa          Boolean        @default(true)
+  criadoEm       DateTime       @default(now()) @map("criado_em")
+  atualizadoEm   DateTime       @updatedAt @map("atualizado_em")
+
+  adolescente    Adolescente    @relation(fields: [adolescenteId], references: [id])
+  responsavel    Responsavel    @relation(fields: [responsavelId], references: [id])
+
+  @@map("mesadas")
+}
+
+enum Periodicidade {
+  semanal
+  quinzenal
+  mensal
+}
+
+model Movimentacao {
+  id           String    @id @default(uuid()) @map("movimentacaoId")
+  contaId      String
+  tipo         Tipo
+  origem       Origem
+  valor        Float
+  descricao    String?
+  criadoEm     DateTime  @default(now()) @map("criado_em")
+
+  conta        Conta     @relation(fields: [contaId], references: [id])
+
+  @@map("movimentacoes")
+}
+
+enum Tipo {
+  credito
+  debito
+}
+
+enum Origem {
+  mesada
+  ajuste_manual
+  gasto
+}
