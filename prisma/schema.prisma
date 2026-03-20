@@ -36,39 +36,46 @@ model Responsavel {
   criadoEm     DateTime      @default(now()) @map("criado_em")
   atualizadoEm DateTime      @updatedAt @map("atualizado_em")
 
-  usuario      Usuario       @relation(fields: [usuarioId], references: [id])
+  usuario      Usuario       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   adolescente  Adolescente[]
   mesadas      Mesada[]
+  missoes      Missao[]
+  quizzes      Quiz[]
+  validacoes   MissaoAtribuicao[] @relation("MissaoValidacaoResponsavel")
 
   @@map("responsaveis")
 }
 
 model Adolescente {
-  id             String        @id @default(uuid()) @map("adolescenteId")
-  usuarioId      String        @unique
-  responsavelId  String
-  cpf            String?       @unique
-  dataNascimento DateTime      @map("data_nascimento")
-  telefone       String?
-  criadoEm       DateTime      @default(now()) @map("criado_em")
-  atualizadoEm   DateTime      @updatedAt @map("atualizado_em")
+  id                String              @id @default(uuid()) @map("adolescenteId")
+  usuarioId         String              @unique
+  responsavelId     String
+  cpf               String?             @unique
+  dataNascimento    DateTime            @map("data_nascimento")
+  telefone          String?
+  criadoEm          DateTime            @default(now()) @map("criado_em")
+  atualizadoEm      DateTime            @updatedAt @map("atualizado_em")
 
-  usuario        Usuario       @relation(fields: [usuarioId], references: [id])
-  responsavel    Responsavel   @relation(fields: [responsavelId], references: [id])
-  conta          Conta?
-  mesadas        Mesada[]
+  usuario           Usuario             @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  responsavel       Responsavel         @relation(fields: [responsavelId], references: [id], onDelete: Cascade)
+  conta             Conta?
+  mesadas           Mesada[]
+  missoes           MissaoAtribuicao[]
+  quizTentativas    QuizTentativa[]
+  pontuacaoEventos  PontuacaoEvento[]
 
+  @@index([responsavelId])
   @@map("adolescentes")
 }
 
 model Conta {
   id             String         @id @default(uuid()) @map("contaId")
   adolescenteId  String         @unique
-  saldoTotal     Float          @default(0) @map("saldo_total")
+  saldoTotal     Decimal        @default(0) @db.Decimal(12, 2) @map("saldo_total")
   criadoEm       DateTime       @default(now()) @map("criado_em")
   atualizadoEm   DateTime       @updatedAt @map("atualizado_em")
 
-  adolescente    Adolescente    @relation(fields: [adolescenteId], references: [id])
+  adolescente    Adolescente    @relation(fields: [adolescenteId], references: [id], onDelete: Cascade)
   movimentacoes  Movimentacao[]
 
   @@map("contas")
@@ -78,15 +85,19 @@ model Mesada {
   id             String         @id @default(uuid()) @map("mesadaId")
   adolescenteId  String
   responsavelId  String
-  valor          Float
+  valor          Decimal        @db.Decimal(12, 2)
   periodicidade  Periodicidade
+  descricao      String?
+  dataInicio     DateTime       @default(now()) @map("data_inicio")
   ativa          Boolean        @default(true)
   criadoEm       DateTime       @default(now()) @map("criado_em")
   atualizadoEm   DateTime       @updatedAt @map("atualizado_em")
 
-  adolescente    Adolescente    @relation(fields: [adolescenteId], references: [id])
-  responsavel    Responsavel    @relation(fields: [responsavelId], references: [id])
+  adolescente    Adolescente    @relation(fields: [adolescenteId], references: [id], onDelete: Cascade)
+  responsavel    Responsavel    @relation(fields: [responsavelId], references: [id], onDelete: Cascade)
 
+  @@index([adolescenteId, ativa])
+  @@index([responsavelId])
   @@map("mesadas")
 }
 
@@ -101,12 +112,14 @@ model Movimentacao {
   contaId      String
   tipo         Tipo
   origem       Origem
-  valor        Float
+  valor        Decimal   @db.Decimal(12, 2)
   descricao    String?
+  saldoApos    Decimal   @db.Decimal(12, 2) @map("saldo_apos")
   criadoEm     DateTime  @default(now()) @map("criado_em")
 
-  conta        Conta     @relation(fields: [contaId], references: [id])
+  conta        Conta     @relation(fields: [contaId], references: [id], onDelete: Cascade)
 
+  @@index([contaId, criadoEm])
   @@map("movimentacoes")
 }
 
@@ -119,4 +132,149 @@ enum Origem {
   mesada
   ajuste_manual
   gasto
+  recompensa
+}
+
+model Missao {
+  id                  String             @id @default(uuid()) @map("missaoId")
+  responsavelId       String
+  titulo              String
+  descricao           String?
+  pontos              Int
+  recompensaFinanceira Decimal?          @db.Decimal(12, 2) @map("recompensa_financeira")
+  ativa               Boolean            @default(true)
+  criadoEm            DateTime           @default(now()) @map("criado_em")
+  atualizadoEm        DateTime           @updatedAt @map("atualizado_em")
+
+  responsavel         Responsavel        @relation(fields: [responsavelId], references: [id], onDelete: Cascade)
+  atribuicoes         MissaoAtribuicao[]
+
+  @@index([responsavelId, ativa])
+  @@map("missoes")
+}
+
+model MissaoAtribuicao {
+  id                    String        @id @default(uuid()) @map("missaoAtribuicaoId")
+  missaoId              String
+  adolescenteId         String
+  status                MissaoStatus  @default(pendente)
+  dataLimite            DateTime?     @map("data_limite")
+  concluidaEm           DateTime?     @map("concluida_em")
+  validadaEm            DateTime?     @map("validada_em")
+  observacao            String?
+  validadaPorResponsavelId String?    @map("validada_por_responsavel_id")
+  criadoEm              DateTime      @default(now()) @map("criado_em")
+  atualizadoEm          DateTime      @updatedAt @map("atualizado_em")
+
+  missao                Missao         @relation(fields: [missaoId], references: [id], onDelete: Cascade)
+  adolescente           Adolescente    @relation(fields: [adolescenteId], references: [id], onDelete: Cascade)
+  validadaPorResponsavel Responsavel?  @relation("MissaoValidacaoResponsavel", fields: [validadaPorResponsavelId], references: [id], onDelete: SetNull)
+
+  @@unique([missaoId, adolescenteId])
+  @@index([adolescenteId, status])
+  @@map("missoes_atribuicoes")
+}
+
+enum MissaoStatus {
+  pendente
+  concluida
+  validada
+}
+
+model Quiz {
+  id             String         @id @default(uuid()) @map("quizId")
+  responsavelId  String
+  titulo         String
+  descricao      String?
+  ativo          Boolean        @default(true)
+  criadoEm       DateTime       @default(now()) @map("criado_em")
+  atualizadoEm   DateTime       @updatedAt @map("atualizado_em")
+
+  responsavel    Responsavel    @relation(fields: [responsavelId], references: [id], onDelete: Cascade)
+  perguntas      QuizPergunta[]
+  tentativas     QuizTentativa[]
+
+  @@index([responsavelId, ativo])
+  @@map("quizzes")
+}
+
+model QuizPergunta {
+  id             String            @id @default(uuid()) @map("quizPerguntaId")
+  quizId         String
+  enunciado      String
+  ordem          Int
+
+  quiz           Quiz              @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  alternativas   QuizAlternativa[]
+  respostas      QuizResposta[]
+
+  @@unique([quizId, ordem])
+  @@map("quizzes_perguntas")
+}
+
+model QuizAlternativa {
+  id             String           @id @default(uuid()) @map("quizAlternativaId")
+  perguntaId     String
+  texto          String
+  correta        Boolean          @default(false)
+
+  pergunta       QuizPergunta     @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
+  respostas      QuizResposta[]
+
+  @@map("quizzes_alternativas")
+}
+
+model QuizTentativa {
+  id               String          @id @default(uuid()) @map("quizTentativaId")
+  quizId           String
+  adolescenteId    String
+  pontuacao        Int             @default(0)
+  acertos          Int             @default(0)
+  totalPerguntas   Int             @default(0) @map("total_perguntas")
+  finalizadoEm     DateTime        @default(now()) @map("finalizado_em")
+
+  quiz             Quiz            @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  adolescente      Adolescente     @relation(fields: [adolescenteId], references: [id], onDelete: Cascade)
+  respostas        QuizResposta[]
+
+  @@index([adolescenteId, finalizadoEm])
+  @@map("quizzes_tentativas")
+}
+
+model QuizResposta {
+  id              String          @id @default(uuid()) @map("quizRespostaId")
+  tentativaId     String
+  perguntaId      String
+  alternativaId   String
+  correta         Boolean         @default(false)
+
+  tentativa       QuizTentativa   @relation(fields: [tentativaId], references: [id], onDelete: Cascade)
+  pergunta        QuizPergunta    @relation(fields: [perguntaId], references: [id], onDelete: Cascade)
+  alternativa     QuizAlternativa @relation(fields: [alternativaId], references: [id], onDelete: Cascade)
+
+  @@unique([tentativaId, perguntaId])
+  @@map("quizzes_respostas")
+}
+
+model PontuacaoEvento {
+  id             String            @id @default(uuid()) @map("pontuacaoEventoId")
+  adolescenteId  String
+  origemTipo     OrigemPontuacao
+  origemId       String            @map("origem_id")
+  pontos         Int
+  descricao      String?
+  criadoEm       DateTime          @default(now()) @map("criado_em")
+
+  adolescente    Adolescente       @relation(fields: [adolescenteId], references: [id], onDelete: Cascade)
+
+  @@index([adolescenteId, criadoEm])
+  @@index([origemTipo, origemId])
+  @@map("pontuacao_eventos")
+}
+
+enum OrigemPontuacao {
+  missao
+  quiz
+  bonus
+  ajuste
 }

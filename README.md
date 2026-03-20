@@ -1,98 +1,101 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Updin API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API desenvolvida em NestJS com Prisma, organizada por domínio. A aplicação contempla autenticação, gestão familiar, controle financeiro e gamificação com missões, quizzes e ranking baseado em pontuação.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Estrutura
 
-## Description
+- `src/modules/auth`: autenticação e geração de token
+- `src/modules/familia`: gestão de responsáveis e adolescentes
+- `src/modules/financeiro`: contas, mesadas e movimentações
+- `src/modules/gamificacao`: missões, quizzes e ranking
+- `src/common`: guardas, controle de acesso e utilitários compartilhados
+- `prisma/schema.prisma`: modelagem do banco de dados
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Funcionamento da API
 
-## Project setup
+1. O responsável realiza cadastro em `POST /api/auth/register/responsavel`.
+2. O login em `POST /api/auth/login` retorna um token Bearer.
+3. Com o token, o responsável pode criar adolescentes, mesadas, missões e quizzes.
+4. O adolescente acessa seus dados, registra gastos, conclui missões e responde quizzes.
+5. Eventos de pontuação são registrados em `PontuacaoEvento`.
+6. O ranking é calculado dinamicamente a partir desses eventos.
 
-```bash
-$ npm install
-```
+## Endpoints principais
 
-## Compile and run the project
+### Rotas públicas
 
-```bash
-# development
-$ npm run start
+- `GET /api`
+- `POST /api/auth/register/responsavel`
+- `POST /api/auth/login`
 
-# watch mode
-$ npm run start:dev
+### Autenticação
 
-# production mode
-$ npm run start:prod
-```
+- `GET /api/auth/me`
 
-## Run tests
+### Família
 
-```bash
-# unit tests
-$ npm run test
+- `GET /api/responsaveis/me`
+- `GET /api/responsaveis/me/adolescentes`
+- `GET /api/responsaveis/:responsavelId`
+- `GET /api/responsaveis/:responsavelId/adolescentes`
+- `POST /api/responsaveis/:responsavelId/adolescentes`
+- `GET /api/adolescentes/:adolescenteId`
+- `GET /api/adolescentes/:adolescenteId/conta`
+- `GET /api/adolescentes/:adolescenteId/dashboard`
 
-# e2e tests
-$ npm run test:e2e
+### Financeiro
 
-# test coverage
-$ npm run test:cov
-```
+- `POST /api/adolescentes/:adolescenteId/mesadas`
+- `GET /api/adolescentes/:adolescenteId/mesadas`
+- `GET /api/mesadas/:mesadaId`
+- `PATCH /api/mesadas/:mesadaId`
+- `GET /api/contas/:contaId`
+- `GET /api/contas/:contaId/movimentacoes`
+- `POST /api/contas/:contaId/movimentacoes`
+- `GET /api/movimentacoes/:movimentacaoId`
 
-## Deployment
+### Gamificação
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+- `POST /api/responsaveis/:responsavelId/missoes`
+- `GET /api/responsaveis/:responsavelId/missoes`
+- `POST /api/missoes/:missaoId/atribuicoes`
+- `GET /api/adolescentes/:adolescenteId/missoes`
+- `GET /api/missoes/atribuicoes/:atribuicaoId`
+- `PATCH /api/missoes/atribuicoes/:atribuicaoId/concluir`
+- `PATCH /api/missoes/atribuicoes/:atribuicaoId/validar`
+- `POST /api/responsaveis/:responsavelId/quizzes`
+- `GET /api/responsaveis/:responsavelId/quizzes`
+- `GET /api/adolescentes/:adolescenteId/quizzes`
+- `GET /api/quizzes/:quizId`
+- `POST /api/quizzes/:quizId/tentativas/adolescentes/:adolescenteId`
+- `GET /api/quizzes/tentativas/:tentativaId`
+- `GET /api/ranking/global`
+- `GET /api/ranking/responsaveis/:responsavelId`
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Documentação
 
-```bash
-$ npm install -g mau
-$ mau deploy
-```
+A documentação Swagger está disponível em:
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+- `http://localhost:3000/docs`
 
-## Resources
+### Como acessar
 
-Check out a few resources that may come in handy when working with NestJS:
+1. Execute `npm run start:dev`
+2. Acesse `http://localhost:3000/docs`
+3. Faça login em `POST /api/auth/login`
+4. Clique em **Authorize** e informe: `Bearer <token>`
+5. Utilize a interface para testar as rotas protegidas
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Ambiente
 
-## Support
+Variáveis necessárias no `.env`:
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- `DATABASE_URL`
+- `AUTH_TOKEN_SECRET`
 
-## Stay in touch
+## Observações
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+- O ranking é calculado dinamicamente a partir de `PontuacaoEvento`
+- Não há tabela fixa de posições no ranking
+- Missões validadas podem gerar pontos e crédito financeiro
+- Tentativas de quiz geram pontuação automaticamente com base nos acertos

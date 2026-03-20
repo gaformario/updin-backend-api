@@ -1,21 +1,14 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-
-// import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AdolescentesController } from './controllers/adolescentes.controller';
-import { AuthController } from './controllers/auth.controller';
-import { ContasController } from './controllers/contas.controller';
-import { MesadasController } from './controllers/mesadas.controller';
-import { MovimentacoesController } from './controllers/movimentacoes.controller';
-import { ResponsaveisController } from './controllers/responsaveis.controller';
+import { APP_GUARD } from '@nestjs/core';
+import { AppController } from './app.controller';
+import { AuthGuard } from './common/auth/guards/auth.guard';
+import { CommonModule } from './common/common.module';
+import { AuthModule } from './modules/auth/auth.module';
+import { FamiliaModule } from './modules/familia/familia.module';
+import { FinanceiroModule } from './modules/financeiro/financeiro.module';
+import { GamificacaoModule } from './modules/gamificacao/gamificacao.module';
 import { PrismaModule } from './prisma/prisma.module';
-import { AdolescentesService } from './services/adolescentes.service';
-import { AuthService } from './services/auth.service';
-import { ContasService } from './services/contas.service';
-import { MesadasService } from './services/mesadas.service';
-import { MovimentacoesService } from './services/movimentacoes.service';
-import { ResponsaveisService } from './services/responsaveis.service';
 
 @Module({
   imports: [
@@ -23,24 +16,18 @@ import { ResponsaveisService } from './services/responsaveis.service';
       isGlobal: true,
     }),
     PrismaModule,
+    CommonModule,
+    AuthModule,
+    FamiliaModule,
+    FinanceiroModule,
+    GamificacaoModule,
   ],
-  controllers: [
-    // AppController,
-    AuthController,
-    ResponsaveisController,
-    AdolescentesController,
-    ContasController,
-    MesadasController,
-    MovimentacoesController,
-  ],
+  controllers: [AppController],
   providers: [
-    AppService,
-    AuthService,
-    ResponsaveisService,
-    AdolescentesService,
-    ContasService,
-    MesadasService,
-    MovimentacoesService,
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
   ],
 })
 export class AppModule {}
