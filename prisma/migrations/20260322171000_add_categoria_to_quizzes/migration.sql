@@ -1,0 +1,2 @@
+ALTER TABLE "quizzes"
+ADD COLUMN "categoria" TEXT NOT NULL DEFAULT 'Geral';

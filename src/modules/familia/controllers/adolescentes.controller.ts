@@ -53,4 +53,56 @@ export class AdolescentesController {
       adolescenteId,
     );
   }
+
+  @Get(':adolescenteId/estatisticas')
+  @ApiOperation({ summary: 'Estatisticas consolidadas do adolescente' })
+  @ApiParam({ name: 'adolescenteId', example: 'uuid-adolescente' })
+  async getEstatisticas(
+    @Param('adolescenteId') adolescenteId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.adolescentesService.getAdolescenteEstatisticas(
+      user.userId,
+      adolescenteId,
+    );
+  }
+
+  @Get(':adolescenteId/conquistas')
+  @ApiOperation({ summary: 'Conquistas do adolescente' })
+  @ApiParam({ name: 'adolescenteId', example: 'uuid-adolescente' })
+  async getConquistas(
+    @Param('adolescenteId') adolescenteId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.adolescentesService.getAdolescenteConquistas(
+      user.userId,
+      adolescenteId,
+    );
+  }
+
+  @Get(':adolescenteId/xp/semanal')
+  @ApiOperation({ summary: 'Evolucao semanal de XP do adolescente' })
+  @ApiParam({ name: 'adolescenteId', example: 'uuid-adolescente' })
+  async getXpSemanal(
+    @Param('adolescenteId') adolescenteId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.adolescentesService.getAdolescenteXpSemanal(
+      user.userId,
+      adolescenteId,
+    );
+  }
+
+  @Get(':adolescenteId/notificacoes')
+  @ApiOperation({ summary: 'Listar notificacoes do adolescente' })
+  @ApiParam({ name: 'adolescenteId', example: 'uuid-adolescente' })
+  async listNotificacoes(
+    @Param('adolescenteId') adolescenteId: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.adolescentesService.listAdolescenteNotificacoes(
+      user.userId,
+      adolescenteId,
+    );
+  }
 }

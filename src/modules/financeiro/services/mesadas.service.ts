@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UserType } from '@prisma/client';
+import { Prisma, UserType } from '@prisma/client';
 import { AccessControlService } from '../../../common/services/access-control.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateMesadaDto } from '../dto/create-mesada.dto';
@@ -25,8 +25,10 @@ export class MesadasService {
       await this.accessControlService.getUserContextOrFail(userId);
 
     if (context.tipo !== UserType.responsavel || !context.responsavelId) {
-      throw new BadRequestException('Somente responsáveis podem criar mesadas');
+      throw new BadRequestException('Somente responsaveis podem criar mesadas');
     }
+
+    const responsavelId = context.responsavelId;
 
     const adolescente = await this.prisma.adolescente.findUnique({
       where: { id: adolescenteId },
@@ -34,27 +36,39 @@ export class MesadasService {
     });
 
     if (!adolescente) {
-      throw new NotFoundException('Adolescente não encontrado');
+      throw new NotFoundException('Adolescente nao encontrado');
     }
 
-    if (adolescente.responsavelId !== context.responsavelId) {
+    if (adolescente.responsavelId !== responsavelId) {
       throw new BadRequestException(
-        'O adolescente informado não pertence ao responsáveis autenticado',
+        'O adolescente informado nao pertence ao responsavel autenticado',
       );
     }
 
-    return this.prisma.mesada.create({
-      data: {
-        adolescenteId,
-        responsavelId: context.responsavelId,
-        valor: payload.valor,
-        periodicidade: payload.periodicidade,
-        descricao: payload.descricao,
-        dataInicio: payload.dataInicio
-          ? new Date(payload.dataInicio)
-          : new Date(),
-        ativa: true,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const mesada = await tx.mesada.create({
+        data: {
+          adolescenteId,
+          responsavelId,
+          valor: payload.valor,
+          periodicidade: payload.periodicidade,
+          descricao: payload.descricao,
+          dataInicio: payload.dataInicio
+            ? new Date(payload.dataInicio)
+            : new Date(),
+          ativa: true,
+        },
+      });
+
+      await tx.mesadaHistorico.create({
+        data: {
+          mesadaId: mesada.id,
+          adolescenteId,
+          valorNovo: new Prisma.Decimal(payload.valor),
+        },
+      });
+
+      return mesada;
     });
   }
 
@@ -80,7 +94,7 @@ export class MesadasService {
     });
 
     if (!existing) {
-      throw new NotFoundException('Mesada não encontrada');
+      throw new NotFoundException('Mesada nao encontrada');
     }
 
     await this.accessControlService.ensureResponsavelAccess(
@@ -88,15 +102,35 @@ export class MesadasService {
       existing.responsavelId,
     );
 
-    return this.prisma.mesada.update({
-      where: { id: mesadaId },
-      data: {
-        valor: update.valor,
-        periodicidade: update.periodicidade,
-        ativa: update.ativa,
-        descricao: update.descricao,
-        dataInicio: update.dataInicio ? new Date(update.dataInicio) : undefined,
-      },
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.mesada.update({
+        where: { id: mesadaId },
+        data: {
+          valor: update.valor,
+          periodicidade: update.periodicidade,
+          ativa: update.ativa,
+          descricao: update.descricao,
+          dataInicio: update.dataInicio
+            ? new Date(update.dataInicio)
+            : undefined,
+        },
+      });
+
+      if (
+        update.valor !== undefined &&
+        Number(existing.valor) !== Number(update.valor)
+      ) {
+        await tx.mesadaHistorico.create({
+          data: {
+            mesadaId: existing.id,
+            adolescenteId: existing.adolescenteId,
+            valorAnterior: new Prisma.Decimal(existing.valor),
+            valorNovo: new Prisma.Decimal(update.valor),
+          },
+        });
+      }
+
+      return updated;
     });
   }
 
@@ -106,7 +140,7 @@ export class MesadasService {
     });
 
     if (!mesada) {
-      throw new NotFoundException('Mesada não encontrada');
+      throw new NotFoundException('Mesada nao encontrada');
     }
 
     await this.accessControlService.ensureAdolescenteAccess(

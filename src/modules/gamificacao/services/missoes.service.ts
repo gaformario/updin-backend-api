@@ -16,6 +16,8 @@ import { CompleteMissaoDto } from '../dto/complete-missao.dto';
 import { CreateMissaoDto } from '../dto/create-missao.dto';
 import { ValidateMissaoDto } from '../dto/validate-missao.dto';
 
+const MISSAO_XP_BASE = 50;
+
 @Injectable()
 export class MissoesService {
   constructor(
@@ -84,7 +86,7 @@ export class MissoesService {
     });
 
     if (!missao) {
-      throw new NotFoundException('Missão não encontrada');
+      throw new NotFoundException('Missao nao encontrada');
     }
 
     await this.accessControlService.ensureResponsavelAccess(
@@ -105,7 +107,7 @@ export class MissoesService {
 
     if (existing) {
       throw new BadRequestException(
-        'Missão ja atribuida para esse adolescente',
+        'Missao ja atribuida para esse adolescente',
       );
     }
 
@@ -160,7 +162,7 @@ export class MissoesService {
     });
 
     if (!atribuicao) {
-      throw new NotFoundException('Atribuicao de missão nao encontrada');
+      throw new NotFoundException('Atribuicao de missao nao encontrada');
     }
 
     await this.accessControlService.ensureAdolescenteAccess(
@@ -181,7 +183,7 @@ export class MissoesService {
     });
 
     if (!atribuicao) {
-      throw new NotFoundException('Atribuicao de missão nao encontrada');
+      throw new NotFoundException('Atribuicao de missao nao encontrada');
     }
 
     await this.accessControlService.ensureAdolescenteAccess(
@@ -190,7 +192,7 @@ export class MissoesService {
     );
 
     if (atribuicao.status === MissaoStatus.validada) {
-      throw new BadRequestException('Missão já validada');
+      throw new BadRequestException('Missao ja validada');
     }
 
     return this.prisma.missaoAtribuicao.update({
@@ -213,7 +215,7 @@ export class MissoesService {
 
     if (context.tipo !== UserType.responsavel || !context.responsavelId) {
       throw new BadRequestException(
-        'Somente responsáveis podem validar missões',
+        'Somente responsaveis podem validar missoes',
       );
     }
 
@@ -231,20 +233,28 @@ export class MissoesService {
       });
 
       if (!atribuicao) {
-        throw new NotFoundException('Atribuicao de missão nao encontrada');
+        throw new NotFoundException('Atribuicao de missao nao encontrada');
       }
 
       if (atribuicao.missao.responsavelId !== context.responsavelId) {
         throw new BadRequestException(
-          'Missão não pertence ao responsável autenticado',
+          'Missao nao pertence ao responsavel autenticado',
         );
       }
 
       if (atribuicao.status !== MissaoStatus.concluida) {
         throw new BadRequestException(
-          'Somente missões concluídas podem ser validadas',
+          'Somente missoes concluidas podem ser validadas',
         );
       }
+
+      const xpGanho = Math.max(atribuicao.missao.pontos, MISSAO_XP_BASE);
+      const saldoAnterior = atribuicao.adolescente.conta
+        ? new Prisma.Decimal(atribuicao.adolescente.conta.saldoTotal)
+        : new Prisma.Decimal(0);
+      let valorCreditado = new Prisma.Decimal(0);
+      let novoSaldo = saldoAnterior;
+      const mensagemResponsavel = payload.observacao?.trim() || null;
 
       const updated = await tx.missaoAtribuicao.update({
         where: { id: atribuicaoId },
@@ -261,8 +271,8 @@ export class MissoesService {
           adolescenteId: atribuicao.adolescenteId,
           origemTipo: OrigemPontuacao.missao,
           origemId: atribuicao.id,
-          pontos: atribuicao.missao.pontos,
-          descricao: `Missão validada: ${atribuicao.missao.titulo}`,
+          pontos: xpGanho,
+          descricao: `Missao validada: ${atribuicao.missao.titulo}`,
         },
       });
 
@@ -270,16 +280,17 @@ export class MissoesService {
         atribuicao.missao.recompensaFinanceira &&
         atribuicao.adolescente.conta
       ) {
-        const novoSaldo = new Prisma.Decimal(
-          atribuicao.adolescente.conta.saldoTotal,
-        ).plus(atribuicao.missao.recompensaFinanceira);
+        valorCreditado = new Prisma.Decimal(
+          atribuicao.missao.recompensaFinanceira,
+        );
+        novoSaldo = saldoAnterior.plus(valorCreditado);
 
         await tx.movimentacao.create({
           data: {
             contaId: atribuicao.adolescente.conta.id,
             tipo: 'credito',
             origem: 'recompensa',
-            valor: atribuicao.missao.recompensaFinanceira,
+            valor: valorCreditado,
             descricao: `${atribuicao.missao.titulo}`,
             saldoApos: novoSaldo,
           },
@@ -290,6 +301,27 @@ export class MissoesService {
           data: { saldoTotal: novoSaldo },
         });
       }
+
+      await tx.notificacao.create({
+        data: {
+          adolescenteId: atribuicao.adolescenteId,
+          tipo: 'missao_validada',
+          titulo: 'Parabéns!',
+          subtitulo: 'Missão aprovada!',
+          mensagem: mensagemResponsavel,
+          dados: {
+            atribuicaoId: updated.id,
+            missaoId: atribuicao.missaoId,
+            missaoTitulo: atribuicao.missao.titulo,
+            xpGanho,
+            valorCreditado: valorCreditado.toFixed(2),
+            saldoAnterior: saldoAnterior.toFixed(2),
+            novoSaldo: novoSaldo.toFixed(2),
+            mensagemResponsavel,
+            validadaEm: updated.validadaEm?.toISOString() ?? null,
+          },
+        },
+      });
 
       return updated;
     });
@@ -305,12 +337,12 @@ export class MissoesService {
     });
 
     if (!adolescente) {
-      throw new NotFoundException('Adolescente não encontrado');
+      throw new NotFoundException('Adolescente nao encontrado');
     }
 
     if (adolescente.responsavelId !== responsavelId) {
       throw new BadRequestException(
-        'O adolescente informado não pertence ao responsável autenticado',
+        'O adolescente informado nao pertence ao responsavel autenticado',
       );
     }
   }

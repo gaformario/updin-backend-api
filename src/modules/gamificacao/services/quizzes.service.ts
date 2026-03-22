@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -16,21 +17,22 @@ export class QuizzesService {
     private readonly accessControlService: AccessControlService,
   ) {}
 
-  async createQuiz(
-    userId: string,
-    responsavelId: string,
-    payload: CreateQuizDto,
-  ) {
-    await this.accessControlService.ensureResponsavelAccess(
-      userId,
-      responsavelId,
-    );
+  async createQuiz(userId: string, payload: CreateQuizDto) {
+    const context =
+      await this.accessControlService.getUserContextOrFail(userId);
+
+    if (context.tipo !== UserType.responsavel) {
+      throw new ForbiddenException(
+        'Apenas responsaveis podem cadastrar quizzes',
+      );
+    }
+
     this.validateQuizPayload(payload);
 
     return this.prisma.quiz.create({
       data: {
-        responsavelId,
         titulo: payload.titulo,
+        categoria: payload.categoria,
         descricao: payload.descricao,
         perguntas: {
           create: payload.perguntas.map((pergunta) => ({
@@ -56,49 +58,22 @@ export class QuizzesService {
     });
   }
 
-  async listByResponsavel(userId: string, responsavelId: string) {
-    await this.accessControlService.ensureResponsavelAccess(
-      userId,
-      responsavelId,
-    );
-
+  async listPublic() {
     return this.prisma.quiz.findMany({
-      where: { responsavelId },
-      include: {
-        perguntas: {
-          include: {
-            alternativas: true,
-          },
-          orderBy: { ordem: 'asc' },
-        },
-      },
-      orderBy: { criadoEm: 'desc' },
-    });
-  }
-
-  async listByAdolescente(userId: string, adolescenteId: string) {
-    await this.accessControlService.ensureAdolescenteAccess(
-      userId,
-      adolescenteId,
-    );
-
-    const adolescente = await this.prisma.adolescente.findUnique({
-      where: { id: adolescenteId },
-      select: { responsavelId: true },
-    });
-
-    if (!adolescente) {
-      throw new NotFoundException('Adolescente não encontrado');
-    }
-
-    const quizzes = await this.prisma.quiz.findMany({
-      where: {
-        responsavelId: adolescente.responsavelId,
+      where: { ativo: true },
+      select: {
+        id: true,
+        titulo: true,
+        categoria: true,
+        descricao: true,
         ativo: true,
-      },
-      include: {
+        criadoEm: true,
+        atualizadoEm: true,
         perguntas: {
-          include: {
+          select: {
+            id: true,
+            enunciado: true,
+            ordem: true,
             alternativas: {
               select: {
                 id: true,
@@ -111,17 +86,33 @@ export class QuizzesService {
       },
       orderBy: { criadoEm: 'desc' },
     });
-
-    return quizzes;
   }
 
-  async getQuizById(userId: string, quizId: string) {
-    const quiz = await this.prisma.quiz.findUnique({
-      where: { id: quizId },
-      include: {
+  async getQuizById(quizId: string) {
+    const quiz = await this.prisma.quiz.findFirst({
+      where: {
+        id: quizId,
+        ativo: true,
+      },
+      select: {
+        id: true,
+        titulo: true,
+        categoria: true,
+        descricao: true,
+        ativo: true,
+        criadoEm: true,
+        atualizadoEm: true,
         perguntas: {
-          include: {
-            alternativas: true,
+          select: {
+            id: true,
+            enunciado: true,
+            ordem: true,
+            alternativas: {
+              select: {
+                id: true,
+                texto: true,
+              },
+            },
           },
           orderBy: { ordem: 'asc' },
         },
@@ -129,45 +120,10 @@ export class QuizzesService {
     });
 
     if (!quiz) {
-      throw new NotFoundException('Quiz não encontrado');
+      throw new NotFoundException('Quiz nao encontrado ou inativo');
     }
 
-    const context =
-      await this.accessControlService.getUserContextOrFail(userId);
-
-    if (context.tipo === UserType.responsavel) {
-      await this.accessControlService.ensureResponsavelAccess(
-        userId,
-        quiz.responsavelId,
-      );
-      return quiz;
-    }
-
-    if (!context.adolescenteId) {
-      throw new BadRequestException('Usuário adolescente inválido');
-    }
-
-    const adolescente = await this.prisma.adolescente.findUnique({
-      where: { id: context.adolescenteId },
-      select: { responsavelId: true },
-    });
-
-    if (!adolescente || adolescente.responsavelId !== quiz.responsavelId) {
-      throw new BadRequestException(
-        'Quiz não disponível para este adolescente',
-      );
-    }
-
-    return {
-      ...quiz,
-      perguntas: quiz.perguntas.map((pergunta) => ({
-        ...pergunta,
-        alternativas: pergunta.alternativas.map((alternativa) => ({
-          id: alternativa.id,
-          texto: alternativa.texto,
-        })),
-      })),
-    };
+    return quiz;
   }
 
   async submitQuiz(
@@ -206,18 +162,16 @@ export class QuizzesService {
       });
 
       if (!quiz || !quiz.ativo) {
-        throw new NotFoundException('Quiz não encontrado ou inativo');
+        throw new NotFoundException('Quiz nao encontrado ou inativo');
       }
 
       const adolescente = await tx.adolescente.findUnique({
         where: { id: adolescenteId },
-        select: { responsavelId: true },
+        select: { id: true },
       });
 
-      if (!adolescente || adolescente.responsavelId !== quiz.responsavelId) {
-        throw new BadRequestException(
-          'Quiz não disponível para este adolescente',
-        );
+      if (!adolescente) {
+        throw new NotFoundException('Adolescente nao encontrado');
       }
 
       if (payload.respostas.length !== quiz.perguntas.length) {
@@ -305,7 +259,7 @@ export class QuizzesService {
           select: {
             id: true,
             titulo: true,
-            responsavelId: true,
+            categoria: true,
           },
         },
         respostas: true,

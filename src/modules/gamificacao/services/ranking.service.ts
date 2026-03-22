@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { AccessControlService } from '../../../common/services/access-control.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 
+type RankingPeriodo = 'geral' | 'semanal' | 'mensal';
+
 @Injectable()
 export class RankingService {
   constructor(
@@ -11,7 +13,17 @@ export class RankingService {
 
   async getGlobalRanking(userId: string) {
     await this.accessControlService.getUserContextOrFail(userId);
-    return this.buildRanking();
+    return this.buildRanking(undefined, 'geral');
+  }
+
+  async getGlobalWeeklyRanking(userId: string) {
+    await this.accessControlService.getUserContextOrFail(userId);
+    return this.buildRanking(undefined, 'semanal');
+  }
+
+  async getGlobalMonthlyRanking(userId: string) {
+    await this.accessControlService.getUserContextOrFail(userId);
+    return this.buildRanking(undefined, 'mensal');
   }
 
   async getRankingByResponsavel(userId: string, responsavelId: string) {
@@ -19,10 +31,32 @@ export class RankingService {
       userId,
       responsavelId,
     );
-    return this.buildRanking(responsavelId);
+    return this.buildRanking(responsavelId, 'geral');
   }
 
-  private async buildRanking(responsavelId?: string) {
+  async getWeeklyRankingByResponsavel(userId: string, responsavelId: string) {
+    await this.accessControlService.ensureResponsavelAccess(
+      userId,
+      responsavelId,
+    );
+    return this.buildRanking(responsavelId, 'semanal');
+  }
+
+  async getMonthlyRankingByResponsavel(userId: string, responsavelId: string) {
+    await this.accessControlService.ensureResponsavelAccess(
+      userId,
+      responsavelId,
+    );
+    return this.buildRanking(responsavelId, 'mensal');
+  }
+
+  private async buildRanking(
+    responsavelId?: string,
+    periodo: RankingPeriodo = 'geral',
+  ) {
+    const periodoInicio = this.getPeriodoInicio(periodo);
+    const periodoFim = new Date();
+
     const adolescentes = await this.prisma.adolescente.findMany({
       where: responsavelId ? { responsavelId } : undefined,
       include: {
@@ -38,13 +72,23 @@ export class RankingService {
 
     const pontuacoes = await this.prisma.pontuacaoEvento.groupBy({
       by: ['adolescenteId'],
-      where: responsavelId
-        ? {
-            adolescente: {
-              responsavelId,
-            },
-          }
-        : undefined,
+      where: {
+        ...(responsavelId
+          ? {
+              adolescente: {
+                responsavelId,
+              },
+            }
+          : {}),
+        ...(periodoInicio
+          ? {
+              criadoEm: {
+                gte: periodoInicio,
+                lte: periodoFim,
+              },
+            }
+          : {}),
+      },
       _sum: {
         pontos: true,
       },
@@ -57,21 +101,21 @@ export class RankingService {
       pontuacoes.map((item) => [item.adolescenteId, item]),
     );
 
-    const ranking = adolescentes
+    const classificacaoCompleta = adolescentes
       .map((adolescente) => {
         const total = pontuacaoMap.get(adolescente.id);
+        const xpTotal = total?._sum.pontos ?? 0;
+
         return {
           adolescenteId: adolescente.id,
           nome: adolescente.usuario.nome,
           usuario: adolescente.usuario.usuario,
-          pontuacaoTotal: total?._sum.pontos ?? 0,
+          xpTotal,
+          pontuacaoTotal: xpTotal,
           eventosPontuados: total?._count._all ?? 0,
         };
       })
-      .sort(
-        (a, b) =>
-          b.pontuacaoTotal - a.pontuacaoTotal || a.nome.localeCompare(b.nome),
-      )
+      .sort((a, b) => b.xpTotal - a.xpTotal || a.nome.localeCompare(b.nome))
       .map((item, index) => ({
         posicao: index + 1,
         ...item,
@@ -79,8 +123,35 @@ export class RankingService {
 
     return {
       escopo: responsavelId ? 'responsavel' : 'global',
-      totalParticipantes: ranking.length,
-      ranking,
+      criterio: 'xp_total',
+      periodo,
+      periodoInicio: periodoInicio?.toISOString() ?? null,
+      periodoFim: periodo !== 'geral' ? periodoFim.toISOString() : null,
+      totalParticipantes: classificacaoCompleta.length,
+      top3: classificacaoCompleta.slice(0, 3),
+      classificacaoCompleta,
+      ranking: classificacaoCompleta,
     };
+  }
+
+  private getPeriodoInicio(periodo: RankingPeriodo) {
+    if (periodo === 'geral') {
+      return undefined;
+    }
+
+    const now = new Date();
+
+    if (periodo === 'mensal') {
+      return new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+    }
+
+    const inicioSemana = new Date(now);
+    const diaSemana = inicioSemana.getDay();
+    const diasDesdeSegunda = diaSemana === 0 ? 6 : diaSemana - 1;
+
+    inicioSemana.setDate(inicioSemana.getDate() - diasDesdeSegunda);
+    inicioSemana.setHours(0, 0, 0, 0);
+
+    return inicioSemana;
   }
 }

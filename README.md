@@ -1,4 +1,4 @@
-# Updin API
+﻿# Updin API
 
 API desenvolvida em NestJS com Prisma, organizada por domínio. A aplicação contempla autenticação, gestão familiar, controle financeiro e gamificação com missões, quizzes e ranking baseado em pontuação.
 
@@ -15,7 +15,7 @@ API desenvolvida em NestJS com Prisma, organizada por domínio. A aplicação co
 
 1. O responsável realiza cadastro em `POST /api/auth/register/responsavel`.
 2. O login em `POST /api/auth/login` retorna um token Bearer.
-3. Com o token, o responsável pode criar adolescentes, mesadas, missões e quizzes.
+3. Com o token, é possível criar adolescentes, mesadas, missões e quizzes com categoria.
 4. O adolescente acessa seus dados, registra gastos, conclui missões e responde quizzes.
 5. Eventos de pontuação são registrados em `PontuacaoEvento`.
 6. O ranking é calculado dinamicamente a partir desses eventos.
@@ -27,6 +27,8 @@ API desenvolvida em NestJS com Prisma, organizada por domínio. A aplicação co
 - `GET /api`
 - `POST /api/auth/register/responsavel`
 - `POST /api/auth/login`
+- `GET /api/quizzes`
+- `GET /api/quizzes/:quizId`
 
 ### Autenticação
 
@@ -63,9 +65,8 @@ API desenvolvida em NestJS com Prisma, organizada por domínio. A aplicação co
 - `GET /api/missoes/atribuicoes/:atribuicaoId`
 - `PATCH /api/missoes/atribuicoes/:atribuicaoId/concluir`
 - `PATCH /api/missoes/atribuicoes/:atribuicaoId/validar`
-- `POST /api/responsaveis/:responsavelId/quizzes`
-- `GET /api/responsaveis/:responsavelId/quizzes`
-- `GET /api/adolescentes/:adolescenteId/quizzes`
+- `POST /api/quizzes`
+- `GET /api/quizzes`
 - `GET /api/quizzes/:quizId`
 - `POST /api/quizzes/:quizId/tentativas/adolescentes/:adolescenteId`
 - `GET /api/quizzes/tentativas/:tentativaId`

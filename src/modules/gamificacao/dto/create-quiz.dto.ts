@@ -51,6 +51,12 @@ export class CreateQuizDto {
   @MaxLength(120)
   titulo: string;
 
+  @ApiProperty({ example: 'Educacao Financeira' })
+  @IsString()
+  @MinLength(2)
+  @MaxLength(80)
+  categoria: string;
+
   @ApiPropertyOptional({ example: 'Quiz introdutorio sobre mesada e poupanca' })
   @IsOptional()
   @IsString()
