@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AccessControlService } from '../../../common/services/access-control.service';
 import { PrismaService } from '../../../prisma/prisma.service';
+import { mapMovimentacaoToExtratoItem } from '../utils/extrato-item.mapper';
 
 @Injectable()
 export class ContasService {
@@ -39,9 +40,11 @@ export class ContasService {
   async getContaMovimentacoes(userId: string, contaId: string) {
     await this.accessControlService.ensureContaAccess(userId, contaId);
 
-    return this.prisma.movimentacao.findMany({
+    const movimentacoes = await this.prisma.movimentacao.findMany({
       where: { contaId },
       orderBy: { criadoEm: 'desc' },
     });
+
+    return movimentacoes.map(mapMovimentacaoToExtratoItem);
   }
 }

@@ -7,6 +7,7 @@ import { Prisma, UserType } from '@prisma/client';
 import { AccessControlService } from '../../../common/services/access-control.service';
 import { PrismaService } from '../../../prisma/prisma.service';
 import { CreateMovimentacaoDto } from '../dto/create-movimentacao.dto';
+import { mapMovimentacaoToExtratoItem } from '../utils/extrato-item.mapper';
 
 @Injectable()
 export class MovimentacoesService {
@@ -78,7 +79,7 @@ export class MovimentacoesService {
 
     await this.accessControlService.ensureContaAccess(userId, mov.contaId);
 
-    return mov;
+    return mapMovimentacaoToExtratoItem(mov);
   }
 
   private validateMovimentacaoByActor(

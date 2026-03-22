@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { MissaoStatus } from '@prisma/client';
 import { AccessControlService } from '../../../common/services/access-control.service';
+import { mapMovimentacaoToExtratoItem } from '../../financeiro/utils/extrato-item.mapper';
 import { PrismaService } from '../../../prisma/prisma.service';
 
 const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
@@ -78,7 +79,10 @@ export class AdolescentesService {
       throw new NotFoundException('Conta nao encontrada');
     }
 
-    return conta;
+    return {
+      ...conta,
+      movimentacoes: conta.movimentacoes.map(mapMovimentacaoToExtratoItem),
+    };
   }
 
   async getAdolescenteDashboard(userId: string, adolescenteId: string) {
@@ -411,4 +415,3 @@ export class AdolescentesService {
       }));
   }
 }
-

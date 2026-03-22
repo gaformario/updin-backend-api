@@ -1,0 +1,836 @@
+{
+  "meta": {
+    "nomeCenario": "demo_fluxo_front",
+    "descricao": "Seed para testar familia, financeiro, notificacoes, quizzes, ranking e conquistas calculadas no front",
+    "timezone": "America/Sao_Paulo"
+  },
+  "responsavel": {
+    "nome": "Patricia Martins",
+    "usuario": "demo.responsavel",
+    "email": "responsavel@updin.com",
+    "senha": "Senha123!",
+    "cpf": "98765432100",
+    "telefone": "+55 11 98888-1000",
+    "criadoEm": "2026-01-02T12:00:00.000Z"
+  },
+  "adolescentes": [
+    {
+      "slug": "lia",
+      "nome": "Lia Martins",
+      "usuario": "demo.lia",
+      "email": "lia.demo@updin.com",
+      "senha": "Senha123!",
+      "dataNascimento": "2011-04-18",
+      "cpf": "11111111101",
+      "telefone": "+55 11 98888-2001",
+      "criadoEm": "2026-01-03T12:00:00.000Z",
+      "mesada": {
+        "valorAtual": 180,
+        "periodicidade": "mensal",
+        "descricao": "Mesada mensal da Lia",
+        "dataInicio": "2026-01-05T10:00:00.000Z",
+        "historico": [
+          {
+            "valorAnterior": null,
+            "valorNovo": 150,
+            "criadoEm": "2026-01-05T10:00:00.000Z"
+          },
+          {
+            "valorAnterior": 150,
+            "valorNovo": 180,
+            "criadoEm": "2026-02-15T10:00:00.000Z"
+          }
+        ]
+      },
+      "conta": {
+        "movimentacoesBase": [
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 150,
+            "descricao": "Mesada de janeiro",
+            "criadoEm": "2026-01-05T10:05:00.000Z"
+          },
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 180,
+            "descricao": "Mesada de fevereiro",
+            "criadoEm": "2026-02-15T10:05:00.000Z"
+          },
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 180,
+            "descricao": "Mesada de marco",
+            "criadoEm": "2026-03-05T10:05:00.000Z"
+          },
+          {
+            "tipo": "debito",
+            "origem": "gasto",
+            "valor": 45.5,
+            "descricao": "Livro de programacao",
+            "criadoEm": "2026-03-18T14:20:00.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "slug": "bruno",
+      "nome": "Bruno Martins",
+      "usuario": "demo.bruno",
+      "email": "bruno.demo@updin.com",
+      "senha": "Senha123!",
+      "dataNascimento": "2010-11-09",
+      "cpf": "11111111102",
+      "telefone": "+55 11 98888-2002",
+      "criadoEm": "2026-01-03T12:10:00.000Z",
+      "mesada": {
+        "valorAtual": 140,
+        "periodicidade": "mensal",
+        "descricao": "Mesada mensal do Bruno",
+        "dataInicio": "2026-01-06T10:00:00.000Z",
+        "historico": [
+          {
+            "valorAnterior": null,
+            "valorNovo": 120,
+            "criadoEm": "2026-01-06T10:00:00.000Z"
+          },
+          {
+            "valorAnterior": 120,
+            "valorNovo": 140,
+            "criadoEm": "2026-03-01T10:00:00.000Z"
+          }
+        ]
+      },
+      "conta": {
+        "movimentacoesBase": [
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 120,
+            "descricao": "Mesada de janeiro",
+            "criadoEm": "2026-01-06T10:05:00.000Z"
+          },
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 120,
+            "descricao": "Mesada de fevereiro",
+            "criadoEm": "2026-02-06T10:05:00.000Z"
+          },
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 140,
+            "descricao": "Mesada de marco",
+            "criadoEm": "2026-03-06T10:05:00.000Z"
+          },
+          {
+            "tipo": "debito",
+            "origem": "gasto",
+            "valor": 35,
+            "descricao": "Capa para celular",
+            "criadoEm": "2026-03-12T16:20:00.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "slug": "sofia",
+      "nome": "Sofia Martins",
+      "usuario": "demo.sofia",
+      "email": "sofia.demo@updin.com",
+      "senha": "Senha123!",
+      "dataNascimento": "2012-02-21",
+      "cpf": "11111111103",
+      "telefone": "+55 11 98888-2003",
+      "criadoEm": "2026-01-03T12:20:00.000Z",
+      "mesada": {
+        "valorAtual": 100,
+        "periodicidade": "mensal",
+        "descricao": "Mesada mensal da Sofia",
+        "dataInicio": "2026-01-07T10:00:00.000Z",
+        "historico": [
+          {
+            "valorAnterior": null,
+            "valorNovo": 100,
+            "criadoEm": "2026-01-07T10:00:00.000Z"
+          }
+        ]
+      },
+      "conta": {
+        "movimentacoesBase": [
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 100,
+            "descricao": "Mesada de janeiro",
+            "criadoEm": "2026-01-07T10:05:00.000Z"
+          },
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 100,
+            "descricao": "Mesada de fevereiro",
+            "criadoEm": "2026-02-07T10:05:00.000Z"
+          },
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 100,
+            "descricao": "Mesada de marco",
+            "criadoEm": "2026-03-07T10:05:00.000Z"
+          },
+          {
+            "tipo": "debito",
+            "origem": "gasto",
+            "valor": 25,
+            "descricao": "Material de desenho",
+            "criadoEm": "2026-03-11T15:10:00.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "slug": "enzo",
+      "nome": "Enzo Martins",
+      "usuario": "demo.enzo",
+      "email": "enzo.demo@updin.com",
+      "senha": "Senha123!",
+      "dataNascimento": "2013-08-30",
+      "cpf": "11111111104",
+      "telefone": "+55 11 98888-2004",
+      "criadoEm": "2026-01-03T12:30:00.000Z",
+      "mesada": {
+        "valorAtual": 100,
+        "periodicidade": "mensal",
+        "descricao": "Mesada mensal do Enzo",
+        "dataInicio": "2026-01-08T10:00:00.000Z",
+        "historico": [
+          {
+            "valorAnterior": null,
+            "valorNovo": 90,
+            "criadoEm": "2026-01-08T10:00:00.000Z"
+          },
+          {
+            "valorAnterior": 90,
+            "valorNovo": 100,
+            "criadoEm": "2026-03-05T10:00:00.000Z"
+          }
+        ]
+      },
+      "conta": {
+        "movimentacoesBase": [
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 90,
+            "descricao": "Mesada de janeiro",
+            "criadoEm": "2026-01-08T10:05:00.000Z"
+          },
+          {
+            "tipo": "credito",
+            "origem": "mesada",
+            "valor": 100,
+            "descricao": "Mesada de marco",
+            "criadoEm": "2026-03-08T10:05:00.000Z"
+          },
+          {
+            "tipo": "debito",
+            "origem": "gasto",
+            "valor": 18,
+            "descricao": "Figurinhas e adesivos",
+            "criadoEm": "2026-03-15T14:00:00.000Z"
+          }
+        ]
+      }
+    }
+  ],
+  "missoes": [
+    {
+      "slug": "quarto-em-ordem",
+      "titulo": "Quarto em ordem",
+      "descricao": "Organizar o quarto por 7 dias seguidos.",
+      "pontos": 60,
+      "recompensaFinanceira": 20,
+      "ativa": true,
+      "criadoEm": "2026-02-28T09:00:00.000Z"
+    },
+    {
+      "slug": "mercado-da-semana",
+      "titulo": "Mercado da semana",
+      "descricao": "Ajudar na lista e comparar precos no mercado.",
+      "pontos": 65,
+      "recompensaFinanceira": 35,
+      "ativa": true,
+      "criadoEm": "2026-02-28T09:10:00.000Z"
+    },
+    {
+      "slug": "revisar-matematica",
+      "titulo": "Revisar matematica",
+      "descricao": "Fazer uma revisao de 30 minutos por 5 dias.",
+      "pontos": 50,
+      "recompensaFinanceira": null,
+      "ativa": true,
+      "criadoEm": "2026-02-28T09:20:00.000Z"
+    },
+    {
+      "slug": "organizar-material-escolar",
+      "titulo": "Organizar material escolar",
+      "descricao": "Separar mochila, cadernos e uniforme para a semana.",
+      "pontos": 55,
+      "recompensaFinanceira": 10,
+      "ativa": true,
+      "criadoEm": "2026-02-28T09:30:00.000Z"
+    },
+    {
+      "slug": "caminhada-com-familia",
+      "titulo": "Caminhada com a familia",
+      "descricao": "Fazer 3 caminhadas de 30 minutos na semana.",
+      "pontos": 45,
+      "recompensaFinanceira": null,
+      "ativa": true,
+      "criadoEm": "2026-02-28T09:40:00.000Z"
+    },
+    {
+      "slug": "planejar-gastos-da-semana",
+      "titulo": "Planejar gastos da semana",
+      "descricao": "Montar um plano simples antes de gastar a mesada.",
+      "pontos": 70,
+      "recompensaFinanceira": 15,
+      "ativa": true,
+      "criadoEm": "2026-02-28T09:50:00.000Z"
+    }
+  ],
+  "atribuicoesMissoes": [
+    {
+      "adolescenteSlug": "lia",
+      "missaoSlug": "quarto-em-ordem",
+      "status": "validada",
+      "dataLimite": "2026-03-07T23:59:59.000Z",
+      "criadoEm": "2026-03-01T08:00:00.000Z",
+      "concluidaEm": "2026-03-07T18:30:00.000Z",
+      "validadaEm": "2026-03-08T10:00:00.000Z",
+      "observacao": "Quarto impecavel por sete dias.",
+      "mensagemNotificacao": "Seu capricho rendeu premio em dinheiro.",
+      "conquistasRelacionadas": ["primeira_missao"]
+    },
+    {
+      "adolescenteSlug": "lia",
+      "missaoSlug": "mercado-da-semana",
+      "status": "validada",
+      "dataLimite": "2026-03-16T23:59:59.000Z",
+      "criadoEm": "2026-03-10T08:00:00.000Z",
+      "concluidaEm": "2026-03-16T19:00:00.000Z",
+      "validadaEm": "2026-03-17T10:15:00.000Z",
+      "observacao": "Comparou precos e ajudou a montar a lista.",
+      "mensagemNotificacao": "Excelente organizacao e atencao ao orcamento.",
+      "conquistasRelacionadas": []
+    },
+    {
+      "adolescenteSlug": "lia",
+      "missaoSlug": "revisar-matematica",
+      "status": "concluida",
+      "dataLimite": "2026-03-22T23:59:59.000Z",
+      "criadoEm": "2026-03-18T08:00:00.000Z",
+      "concluidaEm": "2026-03-21T17:30:00.000Z",
+      "validadaEm": null,
+      "observacao": "Revisao enviada e aguardando validacao."
+    },
+    {
+      "adolescenteSlug": "lia",
+      "missaoSlug": "caminhada-com-familia",
+      "status": "pendente",
+      "dataLimite": "2026-03-24T23:59:59.000Z",
+      "criadoEm": "2026-03-20T08:00:00.000Z",
+      "concluidaEm": null,
+      "validadaEm": null,
+      "observacao": "Fazer tres caminhadas de 30 minutos."
+    },
+    {
+      "adolescenteSlug": "bruno",
+      "missaoSlug": "organizar-material-escolar",
+      "status": "validada",
+      "dataLimite": "2026-03-09T23:59:59.000Z",
+      "criadoEm": "2026-03-03T08:00:00.000Z",
+      "concluidaEm": "2026-03-09T18:00:00.000Z",
+      "validadaEm": "2026-03-10T09:45:00.000Z",
+      "observacao": "Tudo separado para a semana.",
+      "mensagemNotificacao": "Organizacao aprovada com sucesso.",
+      "conquistasRelacionadas": ["primeira_missao"]
+    },
+    {
+      "adolescenteSlug": "bruno",
+      "missaoSlug": "planejar-gastos-da-semana",
+      "status": "concluida",
+      "dataLimite": "2026-03-19T23:59:59.000Z",
+      "criadoEm": "2026-03-15T08:00:00.000Z",
+      "concluidaEm": "2026-03-19T20:00:00.000Z",
+      "validadaEm": null,
+      "observacao": "Planejamento feito e enviado."
+    },
+    {
+      "adolescenteSlug": "bruno",
+      "missaoSlug": "caminhada-com-familia",
+      "status": "pendente",
+      "dataLimite": "2026-03-25T23:59:59.000Z",
+      "criadoEm": "2026-03-20T08:00:00.000Z",
+      "concluidaEm": null,
+      "validadaEm": null,
+      "observacao": "Faltam duas caminhadas para concluir."
+    },
+    {
+      "adolescenteSlug": "sofia",
+      "missaoSlug": "revisar-matematica",
+      "status": "validada",
+      "dataLimite": "2026-03-06T23:59:59.000Z",
+      "criadoEm": "2026-03-02T08:00:00.000Z",
+      "concluidaEm": "2026-03-06T17:40:00.000Z",
+      "validadaEm": "2026-03-06T20:00:00.000Z",
+      "observacao": "Revisou todos os exercicios da semana.",
+      "mensagemNotificacao": "Muito bom! Sua disciplina foi validada.",
+      "conquistasRelacionadas": ["primeira_missao"]
+    },
+    {
+      "adolescenteSlug": "sofia",
+      "missaoSlug": "mercado-da-semana",
+      "status": "concluida",
+      "dataLimite": "2026-03-18T23:59:59.000Z",
+      "criadoEm": "2026-03-12T08:00:00.000Z",
+      "concluidaEm": "2026-03-18T18:00:00.000Z",
+      "validadaEm": null,
+      "observacao": "Lista concluida e notas tiradas."
+    },
+    {
+      "adolescenteSlug": "sofia",
+      "missaoSlug": "organizar-material-escolar",
+      "status": "pendente",
+      "dataLimite": "2026-03-23T23:59:59.000Z",
+      "criadoEm": "2026-03-19T08:00:00.000Z",
+      "concluidaEm": null,
+      "validadaEm": null,
+      "observacao": "Montar mochila e separar uniforme."
+    },
+    {
+      "adolescenteSlug": "enzo",
+      "missaoSlug": "planejar-gastos-da-semana",
+      "status": "validada",
+      "dataLimite": "2026-03-13T23:59:59.000Z",
+      "criadoEm": "2026-03-06T08:00:00.000Z",
+      "concluidaEm": "2026-03-13T17:00:00.000Z",
+      "validadaEm": "2026-03-14T10:30:00.000Z",
+      "observacao": "Montou um plano simples de gastos com ajuda.",
+      "mensagemNotificacao": "Planejamento aprovado e recompensa liberada.",
+      "conquistasRelacionadas": ["primeira_missao"]
+    },
+    {
+      "adolescenteSlug": "enzo",
+      "missaoSlug": "caminhada-com-familia",
+      "status": "concluida",
+      "dataLimite": "2026-03-21T23:59:59.000Z",
+      "criadoEm": "2026-03-17T08:00:00.000Z",
+      "concluidaEm": "2026-03-21T11:00:00.000Z",
+      "validadaEm": null,
+      "observacao": "Concluiu duas caminhadas e registrou fotos."
+    },
+    {
+      "adolescenteSlug": "enzo",
+      "missaoSlug": "quarto-em-ordem",
+      "status": "pendente",
+      "dataLimite": "2026-03-24T23:59:59.000Z",
+      "criadoEm": "2026-03-19T08:00:00.000Z",
+      "concluidaEm": null,
+      "validadaEm": null,
+      "observacao": "Guardar brinquedos e organizar a mesa."
+    }
+  ],
+  "quizzes": [
+    {
+      "slug": "mesada-inteligente",
+      "titulo": "Mesada Inteligente",
+      "categoria": "Financeiro",
+      "descricao": "Boas praticas para usar a mesada com equilibrio.",
+      "ativo": true,
+      "criadoEm": "2026-03-01T13:00:00.000Z",
+      "perguntas": [
+        {
+          "ordem": 1,
+          "enunciado": "Qual e a melhor atitude ao receber a mesada?",
+          "alternativas": [
+            { "texto": "Gastar tudo no mesmo dia", "correta": false },
+            { "texto": "Separar uma parte para guardar", "correta": true },
+            { "texto": "Emprestar tudo para amigos", "correta": false },
+            { "texto": "Esconder sem anotar", "correta": false }
+          ]
+        },
+        {
+          "ordem": 2,
+          "enunciado": "O que ajuda a controlar os gastos?",
+          "alternativas": [
+            { "texto": "Anotar entradas e saidas", "correta": true },
+            { "texto": "Comprar por impulso", "correta": false },
+            { "texto": "Ignorar o saldo", "correta": false },
+            { "texto": "Pedir dinheiro sem planejar", "correta": false }
+          ]
+        },
+        {
+          "ordem": 3,
+          "enunciado": "Se um produto esta mais barato em outra loja, voce deve:",
+          "alternativas": [
+            { "texto": "Comprar o mais caro", "correta": false },
+            { "texto": "Comparar antes de decidir", "correta": true },
+            { "texto": "Desistir de pesquisar sempre", "correta": false },
+            { "texto": "Levar dois sem precisar", "correta": false }
+          ]
+        },
+        {
+          "ordem": 4,
+          "enunciado": "Para que serve uma reserva de emergencia?",
+          "alternativas": [
+            { "texto": "Para gastos inesperados", "correta": true },
+            { "texto": "Para presentes caros imediatos", "correta": false },
+            { "texto": "Para jogos toda semana", "correta": false },
+            { "texto": "Para comprar sem pensar", "correta": false }
+          ]
+        },
+        {
+          "ordem": 5,
+          "enunciado": "Um objetivo financeiro claro pode ser:",
+          "alternativas": [
+            { "texto": "Gastar sem limite", "correta": false },
+            { "texto": "Guardar para um curso", "correta": true },
+            { "texto": "Comprar tudo que aparecer", "correta": false },
+            { "texto": "Nunca revisar o plano", "correta": false }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "seguranca-digital",
+      "titulo": "Seguranca Digital",
+      "categoria": "Tecnologia",
+      "descricao": "Cuidados basicos com senhas, links e privacidade.",
+      "ativo": true,
+      "criadoEm": "2026-03-02T13:00:00.000Z",
+      "perguntas": [
+        {
+          "ordem": 1,
+          "enunciado": "Ao criar uma senha forte, o ideal e:",
+          "alternativas": [
+            { "texto": "Usar data de nascimento", "correta": false },
+            { "texto": "Combinar letras, numeros e simbolos", "correta": true },
+            { "texto": "Repetir 123456", "correta": false },
+            { "texto": "Usar so o proprio nome", "correta": false }
+          ]
+        },
+        {
+          "ordem": 2,
+          "enunciado": "Se voce receber um link estranho, o melhor e:",
+          "alternativas": [
+            {
+              "texto": "Clicar rapido para ver do que se trata",
+              "correta": false
+            },
+            {
+              "texto": "Ignorar e confirmar a origem com cuidado",
+              "correta": true
+            },
+            { "texto": "Compartilhar com os amigos", "correta": false },
+            { "texto": "Responder com sua senha", "correta": false }
+          ]
+        },
+        {
+          "ordem": 3,
+          "enunciado": "Atualizacoes do celular costumam servir para:",
+          "alternativas": [
+            { "texto": "Ocupar espaco sem motivo", "correta": false },
+            {
+              "texto": "Melhorar seguranca e corrigir falhas",
+              "correta": true
+            },
+            { "texto": "Deixar apps piores", "correta": false },
+            { "texto": "Apagar contatos", "correta": false }
+          ]
+        },
+        {
+          "ordem": 4,
+          "enunciado": "Em rede social, e mais seguro:",
+          "alternativas": [
+            { "texto": "Deixar tudo publico", "correta": false },
+            { "texto": "Aceitar qualquer desconhecido", "correta": false },
+            {
+              "texto": "Revisar as configuracoes de privacidade",
+              "correta": true
+            },
+            { "texto": "Postar documentos pessoais", "correta": false }
+          ]
+        },
+        {
+          "ordem": 5,
+          "enunciado": "Um codigo enviado por app de banco:",
+          "alternativas": [
+            {
+              "texto": "Pode ser compartilhado com qualquer pessoa",
+              "correta": false
+            },
+            { "texto": "Deve ser guardado em grupos", "correta": false },
+            {
+              "texto": "Serve so para voce confirmar o acesso",
+              "correta": true
+            },
+            { "texto": "Substitui sua senha para sempre", "correta": false }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "casa-organizada",
+      "titulo": "Casa Organizada",
+      "categoria": "Responsabilidade",
+      "descricao": "Rotina, colaboracao e organizacao nas tarefas do dia a dia.",
+      "ativo": true,
+      "criadoEm": "2026-03-03T13:00:00.000Z",
+      "perguntas": [
+        {
+          "ordem": 1,
+          "enunciado": "Antes de iniciar uma tarefa de casa, o melhor e:",
+          "alternativas": [
+            { "texto": "Esperar reclamarem", "correta": false },
+            { "texto": "Combinar o que precisa ser feito", "correta": true },
+            { "texto": "Esconder a bagunca", "correta": false },
+            { "texto": "Deixar para outra pessoa", "correta": false }
+          ]
+        },
+        {
+          "ordem": 2,
+          "enunciado": "Guardar o material escolar apos usar ajuda a:",
+          "alternativas": [
+            { "texto": "Perder menos tempo depois", "correta": true },
+            { "texto": "Baguncar a mochila", "correta": false },
+            { "texto": "Comprar tudo de novo", "correta": false },
+            { "texto": "Esquecer prazos", "correta": false }
+          ]
+        },
+        {
+          "ordem": 3,
+          "enunciado": "Lavar a louca com cuidado mostra:",
+          "alternativas": [
+            { "texto": "Irresponsabilidade", "correta": false },
+            { "texto": "Desinteresse", "correta": false },
+            { "texto": "Colaboracao com a familia", "correta": true },
+            { "texto": "Pressa para sair", "correta": false }
+          ]
+        },
+        {
+          "ordem": 4,
+          "enunciado": "Fazer uma checklist semanal serve para:",
+          "alternativas": [
+            { "texto": "Complicar a rotina", "correta": false },
+            { "texto": "Visualizar tarefas pendentes", "correta": true },
+            { "texto": "Evitar qualquer ajuda", "correta": false },
+            { "texto": "Nunca repetir habitos", "correta": false }
+          ]
+        },
+        {
+          "ordem": 5,
+          "enunciado": "Quando termina uma tarefa, o ideal e:",
+          "alternativas": [
+            { "texto": "Avisar e conferir o resultado", "correta": true },
+            { "texto": "Deixar tudo pela metade", "correta": false },
+            { "texto": "Esconder erros", "correta": false },
+            { "texto": "Ignorar combinados", "correta": false }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "alimentacao-equilibrada",
+      "titulo": "Alimentacao Equilibrada",
+      "categoria": "Saude",
+      "descricao": "Habitos simples para energia, hidratacao e boas escolhas.",
+      "ativo": true,
+      "criadoEm": "2026-03-04T13:00:00.000Z",
+      "perguntas": [
+        {
+          "ordem": 1,
+          "enunciado": "Um lanche equilibrado pode ter:",
+          "alternativas": [
+            { "texto": "Refrigerante e bala", "correta": false },
+            { "texto": "Fruta e iogurte", "correta": true },
+            { "texto": "So batata frita", "correta": false },
+            { "texto": "Pular a refeicao", "correta": false }
+          ]
+        },
+        {
+          "ordem": 2,
+          "enunciado": "Beber agua ao longo do dia ajuda em:",
+          "alternativas": [
+            { "texto": "Hidratacao e concentracao", "correta": true },
+            { "texto": "Cansaco maior", "correta": false },
+            { "texto": "Esquecer a fome sempre", "correta": false },
+            { "texto": "Substituir toda comida", "correta": false }
+          ]
+        },
+        {
+          "ordem": 3,
+          "enunciado": "O cafe da manha costuma ser importante porque:",
+          "alternativas": [
+            { "texto": "Ajuda a iniciar o dia com energia", "correta": true },
+            { "texto": "Deve ser sempre pulado", "correta": false },
+            { "texto": "Serve so no fim de semana", "correta": false },
+            { "texto": "Substitui horas de sono", "correta": false }
+          ]
+        },
+        {
+          "ordem": 4,
+          "enunciado": "Montar um prato colorido indica:",
+          "alternativas": [
+            { "texto": "Variedade de alimentos", "correta": true },
+            { "texto": "Excesso de doces", "correta": false },
+            { "texto": "Falta de legumes", "correta": false },
+            { "texto": "Comer mais rapido", "correta": false }
+          ]
+        },
+        {
+          "ordem": 5,
+          "enunciado": "Antes de uma atividade fisica, e bom:",
+          "alternativas": [
+            { "texto": "Ficar muitas horas sem comer", "correta": false },
+            { "texto": "Consumir algo leve quando preciso", "correta": true },
+            { "texto": "Tomar so refrigerante", "correta": false },
+            { "texto": "Evitar agua sempre", "correta": false }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "empreendedorismo-jovem",
+      "titulo": "Empreendedorismo Jovem",
+      "categoria": "Carreira",
+      "descricao": "Ideias basicas sobre lucro, prazos e melhoria continua.",
+      "ativo": true,
+      "criadoEm": "2026-03-05T13:00:00.000Z",
+      "perguntas": [
+        {
+          "ordem": 1,
+          "enunciado": "Ao vender brigadeiros, calcular o custo ajuda a:",
+          "alternativas": [
+            { "texto": "Saber se ha lucro", "correta": true },
+            { "texto": "Gastar sem controle", "correta": false },
+            { "texto": "Esquecer ingredientes", "correta": false },
+            { "texto": "Vender sem preco", "correta": false }
+          ]
+        },
+        {
+          "ordem": 2,
+          "enunciado": "Divulgar bem um produto significa:",
+          "alternativas": [
+            { "texto": "Explicar valor e publico", "correta": true },
+            { "texto": "Esconder informacoes", "correta": false },
+            { "texto": "Copiar tudo sem adaptar", "correta": false },
+            { "texto": "Nao responder clientes", "correta": false }
+          ]
+        },
+        {
+          "ordem": 3,
+          "enunciado": "Reinvestir parte do ganho pode:",
+          "alternativas": [
+            { "texto": "Ajudar o negocio a crescer", "correta": true },
+            { "texto": "Impedir melhorias", "correta": false },
+            { "texto": "Acabar com a organizacao", "correta": false },
+            { "texto": "Eliminar clientes", "correta": false }
+          ]
+        },
+        {
+          "ordem": 4,
+          "enunciado": "Cumprir prazo com o cliente demonstra:",
+          "alternativas": [
+            { "texto": "Desleixo", "correta": false },
+            { "texto": "Responsabilidade", "correta": true },
+            { "texto": "Improviso sem cuidado", "correta": false },
+            { "texto": "Falta de respeito", "correta": false }
+          ]
+        },
+        {
+          "ordem": 5,
+          "enunciado": "Ouvir feedback serve para:",
+          "alternativas": [
+            { "texto": "Ajustar e melhorar", "correta": true },
+            { "texto": "Ignorar opinioes", "correta": false },
+            { "texto": "Parar de vender", "correta": false },
+            { "texto": "Aumentar confusao", "correta": false }
+          ]
+        }
+      ]
+    }
+  ],
+  "tentativasQuiz": [
+    {
+      "adolescenteSlug": "lia",
+      "quizSlug": "mesada-inteligente",
+      "respostasIndices": [2, 1, 2, 1, 2],
+      "finalizadoEm": "2026-03-14T16:00:00.000Z"
+    },
+    {
+      "adolescenteSlug": "lia",
+      "quizSlug": "seguranca-digital",
+      "respostasIndices": [2, 2, 2, 3, 3],
+      "finalizadoEm": "2026-03-15T16:00:00.000Z"
+    },
+    {
+      "adolescenteSlug": "lia",
+      "quizSlug": "casa-organizada",
+      "respostasIndices": [2, 1, 3, 2, 1],
+      "finalizadoEm": "2026-03-16T16:00:00.000Z"
+    },
+    {
+      "adolescenteSlug": "lia",
+      "quizSlug": "alimentacao-equilibrada",
+      "respostasIndices": [2, 1, 1, 1, 2],
+      "finalizadoEm": "2026-03-18T16:00:00.000Z"
+    },
+    {
+      "adolescenteSlug": "lia",
+      "quizSlug": "empreendedorismo-jovem",
+      "respostasIndices": [1, 1, 1, 2, 1],
+      "finalizadoEm": "2026-03-20T16:00:00.000Z"
+    },
+    {
+      "adolescenteSlug": "bruno",
+      "quizSlug": "mesada-inteligente",
+      "respostasIndices": [2, 1, 4, 1, 3],
+      "finalizadoEm": "2026-03-18T18:10:00.000Z"
+    },
+    {
+      "adolescenteSlug": "bruno",
+      "quizSlug": "seguranca-digital",
+      "respostasIndices": [2, 2, 1, 3, 3],
+      "finalizadoEm": "2026-03-20T18:10:00.000Z"
+    },
+    {
+      "adolescenteSlug": "sofia",
+      "quizSlug": "seguranca-digital",
+      "respostasIndices": [2, 4, 2, 3, 1],
+      "finalizadoEm": "2026-03-17T15:00:00.000Z"
+    },
+    {
+      "adolescenteSlug": "sofia",
+      "quizSlug": "casa-organizada",
+      "respostasIndices": [2, 1, 3, 4, 1],
+      "finalizadoEm": "2026-03-19T15:00:00.000Z"
+    },
+    {
+      "adolescenteSlug": "sofia",
+      "quizSlug": "alimentacao-equilibrada",
+      "respostasIndices": [2, 1, 4, 1, 2],
+      "finalizadoEm": "2026-03-21T15:00:00.000Z"
+    },
+    {
+      "adolescenteSlug": "enzo",
+      "quizSlug": "mesada-inteligente",
+      "respostasIndices": [1, 1, 3, 2, 2],
+      "finalizadoEm": "2026-03-21T11:30:00.000Z"
+    }
+  ]
+}
