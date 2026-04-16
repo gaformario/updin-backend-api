@@ -6,7 +6,7 @@ COPY package*.json ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 COPY nest-cli.json tsconfig*.json ./
 COPY src ./src
