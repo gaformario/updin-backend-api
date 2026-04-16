@@ -4,6 +4,8 @@ WORKDIR /app
 
 ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/updin?schema=public
 
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 COPY package*.json ./
 COPY prisma ./prisma
 COPY prisma.config.ts ./
@@ -18,4 +20,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/main.js"]
