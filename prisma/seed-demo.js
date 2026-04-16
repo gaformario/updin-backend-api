@@ -78,12 +78,47 @@ function createPrismaClient() {
   loadEnvFromFile();
   invariant(Boolean(process.env.DATABASE_URL), 'DATABASE_URL nao definida');
 
-  const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-  });
+  const pool = new Pool(buildPoolConfig(process.env.DATABASE_URL));
 
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
+}
+
+function buildPoolConfig(connectionString) {
+  const url = new URL(connectionString);
+  const sslMode = url.searchParams.get('sslmode');
+  const sslCa = process.env.DATABASE_SSL_CA?.replace(/\\n/g, '\n');
+  const shouldUseSsl = Boolean(sslMode && sslMode !== 'disable');
+
+  if (!shouldUseSsl) {
+    return {
+      connectionString,
+    };
+  }
+
+  url.searchParams.delete('sslmode');
+  url.searchParams.delete('sslcert');
+  url.searchParams.delete('sslkey');
+  url.searchParams.delete('sslrootcert');
+
+  const rejectUnauthorized =
+    process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'true'
+      ? true
+      : process.env.DATABASE_SSL_REJECT_UNAUTHORIZED === 'false'
+        ? false
+        : Boolean(sslCa);
+
+  return {
+    connectionString: url.toString(),
+    ssl: sslCa
+      ? {
+          ca: sslCa,
+          rejectUnauthorized,
+        }
+      : {
+          rejectUnauthorized,
+        },
+  };
 }
 
 function getDatabaseTarget() {
