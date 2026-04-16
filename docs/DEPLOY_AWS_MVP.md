@@ -39,6 +39,7 @@ Exemplo de producao:
 PORT=3000
 HOST=0.0.0.0
 DATABASE_URL=postgresql://updin:SUA_SENHA_FORTE@updin-db.xxxxxxxx.us-east-1.rds.amazonaws.com:5432/updin?schema=public&sslmode=require
+DATABASE_SSL_REJECT_UNAUTHORIZED=false
 AUTH_TOKEN_SECRET=uma-chave-bem-grande-e-aleatoria
 ```
 
@@ -46,6 +47,7 @@ Notas:
 
 - `updin-db.xxxxxxxx.us-east-1.rds.amazonaws.com` e apenas um exemplo de endpoint
 - `sslmode=require` e recomendado para o RDS
+- `DATABASE_SSL_REJECT_UNAUTHORIZED=false` e o atalho mais simples para MVP com `@prisma/adapter-pg`; o caminho mais seguro depois e fornecer a CA do RDS e validar o certificado
 - `AUTH_TOKEN_SECRET` deve ser diferente do ambiente local
 
 ## 1. Criar os servicos na AWS
@@ -174,6 +176,7 @@ Preencha com os dados reais do seu RDS:
 PORT=3000
 HOST=0.0.0.0
 DATABASE_URL=postgresql://updin:SUA_SENHA_FORTE@updin-db.xxxxxxxx.us-east-1.rds.amazonaws.com:5432/updin?schema=public&sslmode=require
+DATABASE_SSL_REJECT_UNAUTHORIZED=false
 AUTH_TOKEN_SECRET=uma-chave-bem-grande-e-aleatoria
 ```
 
