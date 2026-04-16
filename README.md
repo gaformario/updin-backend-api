@@ -94,6 +94,12 @@ Variáveis necessárias no `.env`:
 - `DATABASE_URL`
 - `AUTH_TOKEN_SECRET`
 
+## Deploy
+
+Para subir na AWS EC2 com PostgreSQL no Amazon RDS e deploy automatico por GitHub Actions, veja:
+
+- `docs/DEPLOY_AWS_MVP.md`
+
 ## Observações
 
 - O ranking é calculado dinamicamente a partir de `PontuacaoEvento`
