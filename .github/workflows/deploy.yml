@@ -20,9 +20,25 @@ jobs:
           EC2_SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           DEPLOY_BRANCH: ${{ github.ref_name }}
         run: |
-          test -n "$EC2_HOST"
-          test -n "$EC2_USER"
-          test -n "$EC2_SSH_PRIVATE_KEY"
+          EC2_HOST="$(printf '%s' "$EC2_HOST" | tr -d '\r' | xargs)"
+          EC2_USER="$(printf '%s' "$EC2_USER" | tr -d '\r' | xargs)"
+          EC2_PORT="$(printf '%s' "$EC2_PORT" | tr -d '\r' | xargs)"
+          EC2_APP_DIR="$(printf '%s' "$EC2_APP_DIR" | tr -d '\r' | xargs)"
+
+          if [ -z "$EC2_HOST" ]; then
+            echo "::error::Missing GitHub secret EC2_HOST"
+            exit 1
+          fi
+
+          if [ -z "$EC2_USER" ]; then
+            echo "::error::Missing GitHub secret EC2_USER"
+            exit 1
+          fi
+
+          if [ -z "$EC2_SSH_PRIVATE_KEY" ]; then
+            echo "::error::Missing GitHub secret EC2_SSH_PRIVATE_KEY"
+            exit 1
+          fi
 
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
@@ -32,7 +48,11 @@ jobs:
           SSH_PORT="${EC2_PORT:-22}"
           APP_DIR="${EC2_APP_DIR:-/home/ubuntu/updin-api}"
 
-          ssh-keyscan -p "$SSH_PORT" -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          echo "Checking SSH host key for EC2_HOST on port $SSH_PORT..."
+          if ! ssh-keyscan -p "$SSH_PORT" -H "$EC2_HOST" >> ~/.ssh/known_hosts; then
+            echo "::error::Could not resolve or reach EC2_HOST on port $SSH_PORT. Check EC2_HOST, EC2_PORT, public IP/DNS, and the EC2 security group."
+            exit 1
+          fi
 
           ssh -p "$SSH_PORT" "$EC2_USER@$EC2_HOST" \
             "cd '$APP_DIR' && chmod +x scripts/deploy.sh && APP_DIR='$APP_DIR' ./scripts/deploy.sh '$DEPLOY_BRANCH'"
