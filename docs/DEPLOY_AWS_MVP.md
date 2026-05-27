@@ -4,57 +4,57 @@ Este guia concentra todo o processo de deploy da API na AWS no formato mais simp
 
 - 1 EC2 para rodar a API
 - 1 RDS PostgreSQL para o banco
-- Docker Compose para subir a aplicacao
+- Docker Compose para subir a aplicação
 - GitHub Actions para automatizar os deploys
 
 Com isso, o fluxo fica simples:
 
-1. voce cria a infraestrutura basica na AWS
-2. voce faz o primeiro deploy manual na EC2
-3. depois cada push na `main` pode atualizar a API automaticamente
+1. você cria a infraestrutura básica na AWS
+2. você faz o primeiro deploy manual na EC2
+3. depois, cada push na `main` pode atualizar a API automaticamente
 
 ## Arquitetura recomendada
 
 - API NestJS rodando em container Docker na EC2
 - PostgreSQL gerenciado no Amazon RDS
-- conexao da API com o banco via `DATABASE_URL`
-- deploy automatico por GitHub Actions via SSH
+- conexão da API com o banco via `DATABASE_URL`
+- deploy automático por GitHub Actions via SSH
 
-Esse desenho e um bom equilibrio entre simplicidade, baixo custo operacional e facilidade de manutencao.
+Esse desenho é um bom equilíbrio entre simplicidade, baixo custo operacional e facilidade de manutenção.
 
-## Como ficam as variaveis de ambiente
+## Como ficam as variáveis de ambiente
 
-Hoje voce usa algo como:
+Para rodar localmente, usamos algo como:
 
 ```env
 DATABASE_URL="postgresql://postgres:postgres@localhost:5433/meubanco"
-AUTH_TOKEN_SECRET="updin-local-secret"
+AUTH_TOKEN_SECRET=chave-aleatoria"
 ```
 
-Na AWS com RDS, a API nao usa mais `localhost` para falar com o banco. Ela precisa apontar para o endpoint do RDS.
+Na AWS com RDS, a API não usa mais `localhost` para se comunicar com o banco. Ela precisa apontar para o endpoint do RDS.
 
-Exemplo de producao:
+Exemplo de produção:
 
 ```env
 PORT=3000
 HOST=0.0.0.0
-DATABASE_URL=postgresql://updin:SUA_SENHA_FORTE@updin-db.xxxxxxxx.us-east-1.rds.amazonaws.com:5432/updin?schema=public&sslmode=require
+DATABASE_URL=postgresql://meubanco:SUA_SENHA_FORTE@updin-db.xxxxxxxx.us-east-1.rds.amazonaws.com:5432/banco?schema=public&sslmode=require
 DATABASE_SSL_REJECT_UNAUTHORIZED=false
 AUTH_TOKEN_SECRET=uma-chave-bem-grande-e-aleatoria
 ```
 
 Notas:
 
-- `updin-db.xxxxxxxx.us-east-1.rds.amazonaws.com` e apenas um exemplo de endpoint
-- `sslmode=require` e recomendado para o RDS
-- `DATABASE_SSL_REJECT_UNAUTHORIZED=false` e o atalho mais simples para MVP com `@prisma/adapter-pg`; o caminho mais seguro depois e fornecer a CA do RDS e validar o certificado
+- `mewubanco-db.xxxxxxxx.us-east-1.rds.amazonaws.com` é apenas um exemplo de endpoint
+- `sslmode=require` é recomendado para o RDS
+- `DATABASE_SSL_REJECT_UNAUTHORIZED=false` é o atalho mais simples para MVP com `@prisma/adapter-pg`; o caminho mais seguro depois é fornecer a CA do RDS e validar o certificado
 - `AUTH_TOKEN_SECRET` deve ser diferente do ambiente local
 
-## 1. Criar os servicos na AWS
+## 1. Criar os serviços na AWS
 
-Para esse MVP, o mais simples e usar a VPC padrao da sua conta AWS, desde que EC2 e RDS fiquem na mesma VPC.
+Para esse MVP, o mais simples é usar a VPC padrão da sua conta AWS, desde que EC2 e RDS fiquem na mesma VPC.
 
-Voce vai criar:
+Você vai criar:
 
 - 1 EC2 Ubuntu
 - 1 RDS PostgreSQL
@@ -62,7 +62,7 @@ Voce vai criar:
 
 ## 2. Criar a EC2
 
-Configuracao sugerida:
+Configuração sugerida:
 
 - AMI: Ubuntu 24.04 LTS
 - tipo: `t3.micro` ou `t3.small`
@@ -72,9 +72,9 @@ Configuracao sugerida:
 Crie um Security Group para a EC2 com estas regras de entrada:
 
 - `22/tcp` vindo do seu IP
-- `3000/tcp` vindo do seu IP ou do publico que voce deseja permitir
+- `3000/tcp` vindo do seu IP ou do público que você deseja permitir
 
-Se depois voce quiser dominio com HTTPS, o ideal sera expor `80` e `443` com um proxy reverso, mas para MVP pode comecar em `3000`.
+Se depois você quiser domínio com HTTPS, o ideal será expor `80` e `443` com um proxy reverso, mas, para MVP, pode começar em `3000`.
 
 ## 3. Criar o RDS PostgreSQL
 
@@ -83,7 +83,7 @@ No console da AWS:
 1. Entre em `RDS`
 2. Clique em `Create database`
 3. Escolha `PostgreSQL`
-4. Use `Free tier` ou `Dev/Test`, se disponivel
+4. Use `Free tier` ou `Dev/Test`, se disponível
 5. Defina:
    - DB instance identifier: `updin-db`
    - Master username: `updin`
@@ -91,7 +91,7 @@ No console da AWS:
 6. Em conectividade:
    - use a mesma VPC da EC2
    - escolha `Public access: No`
-   - selecione ou crie um Security Group proprio do banco
+   - selecione ou crie um Security Group próprio do banco
 7. Crie o banco
 
 Depois de criar, anote:
@@ -99,22 +99,22 @@ Depois de criar, anote:
 - endpoint do RDS
 - porta
 - nome do banco
-- usuario
+- usuário
 
 ## 4. Configurar os Security Groups
 
-Essa parte e essencial.
+Essa parte é essencial.
 
 ### Security Group da EC2
 
 Inbound:
 
 - `22/tcp` vindo do seu IP
-- `3000/tcp` vindo do seu IP ou do publico desejado
+- `3000/tcp` vindo do seu IP ou do público desejado
 
 Outbound:
 
-- deixe o padrao liberado
+- deixe o padrão liberado
 
 ### Security Group do RDS
 
@@ -123,7 +123,7 @@ Inbound:
 - `5432/tcp`
 - origem: o Security Group da EC2
 
-Nao libere o banco para `0.0.0.0/0`.
+Não libere o banco para `0.0.0.0/0`.
 
 ## 5. Preparar a EC2
 
@@ -155,7 +155,7 @@ git --version
 
 ## 6. Subir a API pela primeira vez na EC2
 
-Clone o repositorio:
+Clone o repositório:
 
 ```bash
 cd /home/ubuntu
@@ -180,7 +180,7 @@ DATABASE_SSL_REJECT_UNAUTHORIZED=false
 AUTH_TOKEN_SECRET=uma-chave-bem-grande-e-aleatoria
 ```
 
-Suba a aplicacao:
+Suba a aplicação:
 
 ```bash
 docker compose up -d --build
@@ -205,11 +205,11 @@ Testar:
 - `http://SEU_IP_PUBLICO:3000/api`
 - `http://SEU_IP_PUBLICO:3000/docs`
 
-Se a API subir, sua base de infraestrutura esta pronta.
+Se a API subir, sua base de infraestrutura está pronta.
 
 ## 8. Como atualizar manualmente
 
-Antes de automatizar, este e o fluxo manual:
+Antes de automatizar, este é o fluxo manual:
 
 ```bash
 cd /home/ubuntu/updin-api
@@ -217,7 +217,7 @@ git pull
 docker compose up -d --build
 ```
 
-Se quiser, voce tambem pode usar o script do projeto:
+Se quiser, você também pode usar o script do projeto:
 
 ```bash
 cd /home/ubuntu/updin-api
@@ -227,16 +227,16 @@ chmod +x scripts/deploy.sh
 
 ## 9. Automatizar com GitHub Actions
 
-Depois do primeiro deploy manual funcionando, voce pode automatizar.
+Depois do primeiro deploy manual funcionando, você pode automatizar.
 
 O fluxo fica assim:
 
-1. voce faz push para `main`
+1. você faz push para `main`
 2. o GitHub Actions dispara
 3. ele conecta por SSH na EC2
 4. ele executa `scripts/deploy.sh`
 5. a EC2 faz `git pull`
-6. a API rebuilda e sobe com a nova versao
+6. a API rebuilda e sobe com a nova versão
 
 Arquivos envolvidos:
 
@@ -245,9 +245,9 @@ Arquivos envolvidos:
 
 ## 10. Preparar acesso SSH do GitHub Actions para a EC2
 
-O ideal e criar uma chave separada so para deploy.
+O ideal é criar uma chave separada só para deploy.
 
-Na sua maquina local:
+Na sua máquina local:
 
 ```bash
 ssh-keygen -t ed25519 -C "github-actions-deploy" -f github-actions-deploy
@@ -256,9 +256,9 @@ ssh-keygen -t ed25519 -C "github-actions-deploy" -f github-actions-deploy
 Isso gera:
 
 - `github-actions-deploy` -> chave privada
-- `github-actions-deploy.pub` -> chave publica
+- `github-actions-deploy.pub` -> chave pública
 
-Adicione a chave publica na EC2:
+Adicione a chave pública na EC2:
 
 ```bash
 mkdir -p ~/.ssh
@@ -267,18 +267,18 @@ cat >> ~/.ssh/authorized_keys
 chmod 600 ~/.ssh/authorized_keys
 ```
 
-Cole o conteudo do arquivo `.pub` e finalize com `Ctrl+D`.
+Cole o conteúdo do arquivo `.pub` e finalize com `Ctrl+D`.
 
 ## 11. Configurar os secrets no GitHub
 
-No repositorio do GitHub, acesse:
+No repositório do GitHub, acesse:
 
 `Settings > Secrets and variables > Actions`
 
 Crie estes secrets:
 
 - `EC2_HOST`
-  Exemplo: IP publico ou DNS publico da EC2
+  Exemplo: IP público ou DNS público da EC2
 
 - `EC2_USER`
   Exemplo: `ubuntu`
@@ -290,27 +290,27 @@ Crie estes secrets:
   Exemplo: `/home/ubuntu/updin-api`
 
 - `EC2_SSH_PRIVATE_KEY`
-  Conteudo completo da chave privada `github-actions-deploy`
+  Conteúdo completo da chave privada `github-actions-deploy`
 
-## 12. Repositorio publico ou privado
+## 12. Repositório público ou privado
 
-O GitHub Actions conecta na EC2, mas quem faz `git pull` e a propria EC2.
+O GitHub Actions conecta na EC2, mas quem faz `git pull` é a própria EC2.
 
 Isso significa:
 
-- se o repositorio for publico, normalmente funciona direto
-- se o repositorio for privado, a EC2 tambem precisa ter acesso de leitura ao GitHub
+- se o repositório for público, normalmente funciona direto
+- se o repositório for privado, a EC2 também precisa ter acesso de leitura ao GitHub
 
-Para MVP, as opcoes mais simples sao:
+Para MVP, as opções mais simples são:
 
-- usar repositorio publico
-- ou configurar uma deploy key na EC2 para ler o repositorio privado
+- usar repositório público
+- ou configurar uma deploy key na EC2 para ler o repositório privado
 
-Se a EC2 nao conseguir acessar o repositorio, o workflow vai conectar, mas o `git pull` vai falhar.
+Se a EC2 não conseguir acessar o repositório, o workflow vai conectar, mas o `git pull` vai falhar.
 
-## 13. Como testar a automacao
+## 13. Como testar a automação
 
-Primeiro teste o script manualmente na EC2:
+Primeiro, teste o script manualmente na EC2:
 
 ```bash
 cd /home/ubuntu/updin-api
@@ -320,28 +320,28 @@ chmod +x scripts/deploy.sh
 
 Depois:
 
-1. faca push para `main`
+1. faça push para `main`
 2. abra a aba `Actions` no GitHub
 3. acompanhe o workflow `Deploy API`
 
 ## 14. Erros mais comuns
 
-- chave SSH invalida
+- chave SSH inválida
 - porta `22` bloqueada no Security Group
 - `EC2_APP_DIR` incorreto
-- usuario sem permissao para Docker
+- usuário sem permissão para Docker
 - EC2 sem acesso ao GitHub para rodar `git pull`
 - `DATABASE_URL` apontando para host errado
 - RDS sem regra liberando `5432` para o Security Group da EC2
 
-## 15. O que acontece quando voce faz push
+## 15. O que acontece quando você faz push
 
-Com o GitHub Actions configurado, push na `main` nao atualiza o container sozinho por magia. O que acontece e:
+Com o GitHub Actions configurado, push na `main` não atualiza o container sozinho por magia. O que acontece é:
 
 1. o GitHub detecta o push
 2. executa o workflow
 3. o workflow conecta na EC2
-4. a EC2 baixa o codigo novo
+4. a EC2 baixa o código novo
 5. a EC2 rebuilda e reinicia a API
 
-Ou seja, a atualizacao passa a ser automatica, mas porque o Actions executa esse processo no servidor.
+Ou seja, a atualização passa a ser automática, mas porque o Actions executa esse processo no servidor.
